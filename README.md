@@ -45,16 +45,19 @@ FloraGuard addresses this through three layers:
 
 ## Grad-CAM Visualizations
 
-EfficientNetB0 attention maps on garden images — the model correctly attends to disease regions:
+EfficientNetB0 attention maps on garden images. Red = high attention · Blue = low attention.
 
-| Input | Preprocessed | Grad-CAM Attention |
-|---|---|---|
-| ![Rose Disease](reports/gradcam/gradcam_Rose_005.png) | | |
-| ![Rose Disease 2](reports/gradcam/gradcam_Rose_007.png) | | |
-| ![Parijat Healthy](reports/gradcam/gradcam_Parijat_001.png) | | |
-| ![Hibiscus Healthy](reports/gradcam/gradcam_Hibiscus_001.png) | | |
+**Rose_005** — Rose Disease (99.6% confidence)
+![Rose 005](reports/gradcam/gradcam_Rose_005.png)
 
-Red = high model attention · Blue = low attention
+**Rose_007** — Rose Disease (99.7% confidence)
+![Rose 007](reports/gradcam/gradcam_Rose_007.png)
+
+**Parijat_001** — Parijat Healthy (99.1% confidence)
+![Parijat 001](reports/gradcam/gradcam_Parijat_001.png)
+
+**Hibiscus_001** — Hibiscus Healthy (99.9% confidence)
+![Hibiscus 001](reports/gradcam/gradcam_Hibiscus_001.png)
 
 ---
 
@@ -71,44 +74,41 @@ Split: Train 80% (6,715) · Val 20% (1,676) · Test 15% (1,255) · seed=42
 ---
 
 ## Architecture
-Input (224×224×3)
-│
-▼
-Lambda(efficientnet_preprocess)   ← backbone-specific preprocessing baked in
-│
-▼
-EfficientNetB0 (frozen, ImageNet weights)
-│
-▼
-GlobalAveragePooling2D
-│
-BatchNormalization
-│
-Dense(256, relu)
-│
-Dropout(0.4)
-│
-Dense(10, softmax)
 
-**Training:** Google Colab T4 GPU · Adam(lr=1e-4) · Categorical Crossentropy · Class weights for imbalance · 20 epochs · EarlyStopping(patience=5)
+```
+Input (224×224×3)
+       │
+       ▼
+Lambda(efficientnet_preprocess)
+       │
+       ▼
+EfficientNetB0 (frozen, ImageNet weights)
+       │
+       ▼
+GlobalAveragePooling2D → BatchNormalization → Dense(256, relu) → Dropout(0.4) → Dense(10, softmax)
+```
+
+**Training:** Google Colab T4 GPU · Adam(lr=1e-4) · Categorical Crossentropy · Class weights · 20 epochs · EarlyStopping(patience=5)
 
 ---
 
 ## Project Structure
+
+```
 FloraGuard_Project/
 ├── scripts/
-│   ├── preprocess.py          ← OpenCV preprocessing pipeline
-│   ├── check_preprocessing.py ← Preprocessing verification
-│   └── app.py                 ← Streamlit web app
+│   ├── preprocess.py              ← OpenCV preprocessing pipeline
+│   ├── check_preprocessing.py     ← Preprocessing verification
+│   └── app.py                     ← Streamlit web app
 ├── notebooks/
-│   └── FloraGuard_Training.ipynb  ← Training, evaluation, Grad-CAM (Colab)
+│   └── FloraGuard_Training.ipynb  ← Training, evaluation, Grad-CAM
 ├── reports/
 │   ├── confusion_matrix_*.png
 │   ├── comparison_table.png
-│   └── gradcam/               ← Grad-CAM visualizations
+│   └── gradcam/
 ├── requirements.txt
 └── README.md
-
+```
 ---
 
 ## Setup & Run
@@ -134,7 +134,7 @@ The trained model weights are not included in this repo (file size). To obtain t
 Open `notebooks/FloraGuard_Training.ipynb` in Google Colab and run all cells. Requires ~45 minutes on T4 GPU.
 
 **Option B — Download pretrained weights:**
-[Download efficientnet_best.keras]: https://drive.google.com/file/d/19zDfXQbw4pzOdCE8nRVaTdBW_xN2kpwO/view?usp=sharing
+https://drive.google.com/file/d/19zDfXQbw4pzOdCE8nRVaTdBW_xN2kpwO/view?usp=sharing
 
 Place the weights file at `models/efficientnet_best.keras`.
 
